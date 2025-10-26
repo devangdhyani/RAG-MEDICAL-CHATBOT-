@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    /* General Styling and Variables */
+    :root {
+      --primary-green: #238636; 
+      --primary-blue: #005cc5; 
+      --dark-bg: #131720; 
+      --darker-bg: #161b22; 
+      --text-color-light: #e6edf3; 
+      --text-color-dark: #FFFFFF;
+      --light-gray: #a0aab8;
+      --border-color: #2f3a4c;
+      --glow-color: #007aff; 
+
+      --dot-color: #92fe9d; /* Light green/cyan for the dots */
+      --dot-size: 8px;
+      --dot-travel: 14px; 
+      --animation-duration: 1.5s;
+      --avatar-glow-color: #92fe9d; /* Light green/cyan for the glow */
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* RESTORED: Keyframes for the Alternating Half-Circle Glow */
+    /* ---------------------------------------------------------------- */
+    @keyframes alternate-glow {
+      0% { 
+        /* Left side bright, Right side dim */
+        box-shadow: -0.5rem 0 1rem var(--avatar-glow-color), 
+                    0.5rem 0 0.2rem rgba(0, 0, 0, 0); 
+      }
+      50% { 
+        /* Left side dim, Right side bright */
+        box-shadow: -0.5rem 0 0.2rem rgba(0, 0, 0, 0), 
+                    0.5rem 0 1rem var(--avatar-glow-color); 
+      }
+      100% {
+        /* Loops back to initial state */
+        box-shadow: -0.5rem 0 1rem var(--avatar-glow-color), 
+                    0.5rem 0 0.2rem rgba(0, 0, 0, 0); 
+      }
+    }
+
+    /* FINAL CORRECTED KEYFRAMES: Cyclical Anti-Clockwise Path */
+    @keyframes cyclical-climb {
+        0% {
+            transform: translate(0, 0); 
+            opacity: 0.6;
+        }
+        33.333% {
+            transform: translate(var(--dot-travel), calc(-1 * var(--dot-travel))); 
+            opacity: 1;
+        }
+        66.666% {
+            transform: translate(calc(2 * var(--dot-travel)), 0); 
+            opacity: 0.6;
+        }
+        100% {
+            transform: translate(0, 0);
+            opacity: 0.6;
+        }
+    }
+    
+    /* Keyframe Animation for the Moving Glow Effect on Input */
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 5px var(--glow-color), inset 0 0 5px var(--glow-color); }
+      50% { box-shadow: 0 0 15px var(--glow-color), inset 0 0 15px var(--glow-color); }
+      100% { box-shadow: 0 0 5px var(--glow-color), inset 0 0 5px var(--glow-color); }
+    }
+
+    body {
+      background: var(--dark-bg) url('./images/wireframe.png') no-repeat center top / cover;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-color-light);
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Chat Container */
+    .chat-container {
+      width: 100%;
+      max-width: 480px;
+      height: 95vh;
+      max-height: 850px;
+      background: transparent !important; 
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Chat Header */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background: rgba(31, 38, 48, 0.85); 
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: none;
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* AVATAR STYLING (Applies to all DR avatars) - GLOW RESTORED */
+    /* ---------------------------------------------------------------- */
+    .chat-header img, .bot-message img {
+      position: relative; 
+      border-radius: 50%;
+      object-fit: cover;
+      
+      /* Base size and spacing */
+      width: 45px;
+      height: 45px;
+      margin-right: 15px; 
+      
+      /* Base color */
+      background: var(--primary-green); 
+      
+      /* Box shadow properties for the half-circle glow */
+      border: none; /* Removed confusing border properties */
+      padding: 0; 
+      
+      /* Apply the alternating glow effect */
+      animation: alternate-glow 3s linear infinite; 
+      transition: all 0.2s ease;
+    }
+
+    /* Override sizes for message avatars */
+    .bot-message img {
+      width: 38px;
+      height: 38px;
+      margin-top: 2px;
+      margin-right: 10px;
+      margin-left: 0;
+    }
+
+    /* User Avatar (U) */
+    .user-message img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        margin-top: 2px;
+        object-fit: cover;
+        background: var(--primary-blue); 
+        border: none;
+        box-shadow: none;
+        padding: 0; 
+    }
+    /* ---------------------------------------------------------------- */
+
+    .chat-header .title {
+      flex-grow: 1; 
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header .title span:first-child {
+      font-weight: 600;
+      color: var(--text-color-dark);
+      font-size: 16px;
+    }
+
+    .chat-header .title span:last-child {
+      font-size: 12px;
+      color: var(--light-gray);
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    /* Chat Body */
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: transparent !important; 
+    }
+    
+    /* Custom Scrollbar (Webkit) */
+    .chat-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .chat-body::-webkit-scrollbar-thumb {
+        background-color: #2f3a4c;
+        border-radius: 10px;
+        border: 2px solid var(--darker-bg);
+    }
+    .chat-body::-webkit-scrollbar-track {
+        background: transparent; 
+    }
+
+    /* Message Styles */
+    .bot-message, .user-message {
+      display: flex;
+      align-items: flex-start; 
+    }
+    
+    /* Message Bubble - 75% opacity to let background show */
+    .bot-message .msg, .user-message .msg {
+      max-width: 80%; 
+      padding: 10px 14px; 
+      border-radius: 18px; 
+      font-size: 15px;
+      word-wrap: break-word;
+      line-height: 1.4;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); 
+    }
+    
+    /* Bot Bubble (Green) - 75% opacity */
+    .bot-message .msg {
+      background: rgba(35, 134, 54, 0.75); 
+      color: var(--text-color-dark);
+      margin-left: 10px;
+      border-bottom-left-radius: 5px; 
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      min-height: 40px; 
+      width: fit-content; 
+    }
+
+    /* User Message (Blue) - 75% opacity */
+    .user-message {
+      justify-content: flex-end;
+    }
+
+    .user-message .msg {
+      background: rgba(0, 92, 197, 0.75); 
+      color: var(--text-color-dark);
+      border-bottom-right-radius: 5px; 
+      margin-right: 10px;
+    }
+    
+    /* User Message alignment */
+    .user-message > div {
+        align-items: flex-end;
+        order: -1;
+    }
+    
+    /* Time Stamp */
+    .msg-time {
+      font-size: 11px;
+      color: #7d8b99;
+      margin-top: 3px;
+      text-align: right;
+      padding: 0 5px;
+      opacity: 0.7;
+    }
+    
+    .bot-message .msg-time {
+        text-align: left;
+    }
+
+    /* Chat Footer - Input Area */
+    .chat-footer {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(31, 38, 48, 0.85);
+      min-height: 60px;
+    }
+
+    /* Input Field */
+    .chat-footer input {
+      flex: 1;
+      background: #0d1117;
+      border: none;
+      outline: none;
+      padding: 12px;
+      border-radius: 25px;
+      color: var(--text-color-dark);
+      font-size: 14px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 2px rgba(0, 122, 255, 0.3); 
+    }
+    
+    /* Apply the dynamic glow animation when the input is focused */
+    .chat-footer input:focus {
+        background: #1e2538;
+        animation: pulse-glow 1.5s infinite alternate; 
+    }
+
+    /* Send Button */
+    .chat-footer button {
+      background: var(--primary-green);
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: none;
+    }
+
+    .chat-footer button:hover {
+      background: #2ea043;
+      transform: translateY(-2px); 
+      box-shadow: none;
+    }
+    
+    /* ---------------------------------------------------------------- */
+    /* FINAL CORRECTED CLIMBING DOTS STYLING */
+    /* ---------------------------------------------------------------- */
+    #loading .msg {
+        background: transparent !important; 
+        box-shadow: none; 
+        padding: 0; 
+        width: 45px; 
+        min-height: 25px; 
+        font-size: 0; 
+    }
+
+    .bouncing-loader {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end; 
+        height: 100%; 
+        position: relative;
+        width: calc(3 * var(--dot-travel) + var(--dot-size)); 
+        padding-left: 5px; 
+    }
+
+    .bouncing-loader > div {
+        width: var(--dot-size); 
+        height: var(--dot-size);
+        background-color: var(--dot-color); 
+        border-radius: 50%;
+        margin: 0; 
+        animation: cyclical-climb 1.5s infinite ease-in-out; 
+        position: absolute; 
+    }
+
+    /* Set initial horizontal positions and cyclical delays */
+    .bouncing-loader > div:nth-child(1) {
+        left: 0;
+        animation-delay: 0s;
+    }
+    .bouncing-loader > div:nth-child(2) {
+        left: var(--dot-travel); 
+        animation-delay: calc(-1 * var(--animation-duration) / 3); 
+    }
+    .bouncing-loader > div:nth-child(3) {
+        left: calc(2 * var(--dot-travel)); 
+        animation-delay: calc(-2 * var(--animation-duration) / 3); 
+    }
+    /* ---------------------------------------------------------------- */
+
+
+    /* Responsive adjustments */
+    @media (max-width: 500px) {
+        .chat-container {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            max-height: unset;
+        }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <img src="https://placehold.co/45x45/238636/ffffff?text=DR" alt="Doctor Avatar"> 
+      <div class="title">
+        <span>Medical Chatbot</span>
+        <span>Ask me anything!</span>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chat-body">
+      
+    </div>
+
+    <div class="chat-footer">
+      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script>
+    // Function to scroll chat to the bottom with a smooth animation
+    function scrollToBottom() {
+        const chatBody = $("#chat-body");
+        chatBody.stop().animate({ scrollTop: chatBody[0].scrollHeight }, 300);
+    }
+    
+    $(document).ready(function () {
+        // Add the initial bot welcome message on page load
+        const now = new Date();
+        const time = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
+        
+        $("#chat-body").append(`
+            <div class="bot-message">
+              <img src="https://placehold.co/45x45/238636/ffffff?text=DR" alt="Doctor Avatar">
+              <div>
+                <div class="msg">Hello! How can I assist you today?</div>
+                <div class="msg-time">${time}</div>
+              </div>
+            </div>
+        `);
+        scrollToBottom();
+
+        // Handle sending messages
+        $("#send-btn").click(function () {
+          const message = $("#user-input").val().trim();
+          if (message === "") return;
+
+          const now = new Date();
+          const time = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
+
+          // Append user message
+          $("#chat-body").append(`
+            <div class="user-message">
+              <div>
+                <div class="msg">${message}</div>
+                <div class="msg-time">${time}</div>
+              </div>
+              <img src="https://placehold.co/38x38/005cc5/ffffff?text=U" alt="User Avatar"> 
+            </div>
+          `);
+
+          $("#user-input").val("");
+          scrollToBottom();
+
+          // Show bot thinking indicator
+          const loading = $(`<div class="bot-message" id="loading">
+              <img src="https://placehold.co/45x45/238636/ffffff?text=DR">
+              <div>
+                <div class="msg">
+                  <div class="bouncing-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
+              </div>
+            </div>`);
+          $("#chat-body").append(loading);
+          scrollToBottom();
+
+          // --- AJAX CALL TO FLASK BACKEND (RAG Model) ---
+          $.ajax({
+            type: "POST", 
+            url: "/get", 
+            data: { msg: message }, 
+            success: function (response) {
+              $("#loading").remove();
+              
+              // Append the response received from your RAG model
+              $("#chat-body").append(`
+                <div class="bot-message">
+                  <img src="https://placehold.co/45x45/238636/ffffff?text=DR" alt="Doctor Avatar">
+                  <div>
+                    <div class="msg">${response}</div>
+                    <div class="msg-time">${time}</div>
+                  </div>
+                </div>
+              `);
+              scrollToBottom();
+            },
+            error: function () {
+              $("#loading").remove();
+              
+              // Fallback error message for server connection issues
+              $("#chat-body").append(`
+                <div class="bot-message">
+                  <img src="https://placehold.co/45x45/238636/ffffff?text=DR">
+                  <div><div class="msg" style="background:#c23616;">Error: Could not connect to the RAG service. Please check your app.py server status.</div></div>
+                </div>
+              `);
+              scrollToBottom();
+            }
+          });
+          // --- END AJAX CALL ---
+        });
+
+        // Handle sending messages on Enter key press
+        $("#user-input").keypress(function (e) {
+          if (e.which === 13) {
+            $("#send-btn").click();
+          }
+        });
+    });
+  </script>
+</body>
+</html>
