@@ -128,3 +128,17 @@ open up localhost:
    - ECR_REPO
    - PINECONE_API_KEY
    - OPENAI_API_KEY
+# 8.SETup github secrets in azure :
+-  AZURE_CLIENT_ID-
+-  AZURE_TENANT_ID-
+-  AZURE_SUBSCRIPTION_ID-
+-  ACR_LOGIN_SERVER-
+-  AZURE_CLIENT_SECRET-
+-  AZURE_DEFAULT_REGION-
+-  ACR USERNAME-
+-  PINECONE_API_KEY-
+-  GEMINI_API_KEY-
+
+(directory tenant)-a84dbedb-c119-4760-a94a-6569af2389ad
+(client-id)-22904631-4ade-4372-8d28-d27052fac76a
+(loginserver)-medicalchatbot.azurecr.io
