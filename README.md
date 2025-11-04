@@ -57,6 +57,7 @@ open up localhost:
 
 
 
+![alt text](image.png)
 
 # AZURE-CICD-Deployment-with-Github-Actions
 
@@ -125,9 +126,9 @@ open up localhost:
 -  PINECONE_API_KEY-
 -  GEMINI_API_KEY- 
 # 8. SAVE THESE ID :
-# (directory tenant)-a84dbedb-c119-4760-a94a-6569af2389ad
-# (client-id)-22904631-4ade-4372-8d28-d27052fac76a
-# (loginserver)-medicalchatbot.azurecr.io
+- (directory tenant)-a84dbedb-c119-4760-a94a-6569af2389ad
+- (client-id)-22904631-4ade-4372-8d28-d27052fac76a
+- (loginserver)-medicalchatbot.azurecr.io
 
 
 
@@ -204,4 +205,3 @@ open up localhost:
    - OPENAI_API_KEY
 
 
-![alt text](image.png)
