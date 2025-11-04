@@ -131,6 +131,8 @@ open up localhost:
 - (loginserver)-medicalchatbot.azurecr.io
 
 
+![alt text](<Gemini_Generated_Image_yjf2b6yjf2b6yjf2 (1).png>)
+
 
 
 
