@@ -5,8 +5,6 @@
 
 Clone the repository
 
-```bash
-git clonehttps://github.com/entbappy/Build-a-Complete-Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS.git
 ```
 ### STEP 01- Create a conda environment after opening the repository
 
@@ -29,7 +27,7 @@ pip install -r requirements.txt
 
 ```ini
 PINECONE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+GEMINI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 
@@ -56,6 +54,82 @@ open up localhost:
 - Flask
 - GPT
 - Pinecone
+
+
+
+
+# AZURE-CICD-Deployment-with-Github-Actions
+
+## 1. Login to Azure console.
+
+## 2. Create App registration (SERVICE DEPOYMENT) form Active for deployment
+     #with specific access
+
+	1. VM access : It is virtual machine give Role assignment(CONTIBUTER(RBAC)) 
+
+	2. ACR: AZURE Container registry to save your docker image in AZURE ROLE Assignment((ACRPUSH))
+
+        
+	#Description: About the deployment
+
+	1. Build docker image of the source code
+
+	2. Push your docker image to ACR
+
+	3. Launch Your VM 
+
+	4. Pull Your image from ACR in VM
+
+	5. Lauch your docker image in VM
+
+
+        #Policy:
+
+	1. Azure container registry (ACRPUSH)
+
+	2. Azure virtual machine (contibuter)
+
+## 3. Create ACR login server and repo to store/save docker image
+    - Save the URI: medicalchatbot.azureacr.io 	
+## 4. Create VM  machine (Ubuntu) 
+
+## 5. Open VM and Install docker in VM Machine:
+	
+	
+	#optinal
+
+	sudo apt-get update -y
+
+	sudo apt-get upgrade
+	
+	#required
+
+	curl -fsSL https://get.docker.com -o get-docker.sh
+
+	sudo sh get-docker.sh
+
+	sudo usermod -aG docker ubuntu
+
+	newgrp docker
+	
+# 6. Configure VM as self-hosted runner:
+    setting>actions>runner>new self hosted runner> choose os> then run command one by one
+# 7. SETup github secrets in azure :
+-  AZURE_TENANT_ID-
+-  AZURE_SUBSCRIPTION_ID-
+-  ACR_LOGIN_SERVER-
+-   AZURE_CLIENT_ID-
+-  AZURE_CLIENT_SECRET-
+-  AZURE_DEFAULT_REGION-
+-  ACR USERNAME-
+-  PINECONE_API_KEY-
+-  GEMINI_API_KEY- 
+# 8. SAVE THESE ID :
+# (directory tenant)-a84dbedb-c119-4760-a94a-6569af2389ad
+# (client-id)-22904631-4ade-4372-8d28-d27052fac76a
+# (loginserver)-medicalchatbot.azurecr.io
+
+
 
 
 
@@ -92,7 +166,7 @@ open up localhost:
 
 	
 ## 3. Create ECR repo to store/save docker image
-    - Save the URI: 315865595366.dkr.ecr.us-east-1.amazonaws.com/medicalbot
+    - Save the URI: 
 
 	
 ## 4. Create EC2 machine (Ubuntu) 
@@ -128,17 +202,6 @@ open up localhost:
    - ECR_REPO
    - PINECONE_API_KEY
    - OPENAI_API_KEY
-# 8.SETup github secrets in azure :
--  AZURE_CLIENT_ID-
--  AZURE_TENANT_ID-
--  AZURE_SUBSCRIPTION_ID-
--  ACR_LOGIN_SERVER-
--  AZURE_CLIENT_SECRET-
--  AZURE_DEFAULT_REGION-
--  ACR USERNAME-
--  PINECONE_API_KEY-
--  GEMINI_API_KEY-
 
-(directory tenant)-a84dbedb-c119-4760-a94a-6569af2389ad
-(client-id)-22904631-4ade-4372-8d28-d27052fac76a
-(loginserver)-medicalchatbot.azurecr.io
+
+![alt text](image.png)
