@@ -1,4 +1,6 @@
-# Build-a-Complete-Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS
+# Build-a-Complete-Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AZURE     # SHORT DEMO -RAGBASED MEDICALBOT--- https://youtu.be/gzE6AelU-GY   
+                                                                                # LONG BRIEF DEMO -RAGBASED MEDICALBOT --- https://youtu.be/0o3rhd57KkE
+
 
 # How to run?
 ### STEPS:
