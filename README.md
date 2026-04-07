@@ -208,4 +208,5 @@ open up localhost:
    - PINECONE_API_KEY
    - OPENAI_API_KEY
 
+![rag](https://github.com/user-attachments/assets/ca8b738f-a522-44db-9cfb-d908938e4f6c)
 
